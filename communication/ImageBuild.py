@@ -11,7 +11,7 @@ async def get_json(websocket, path):
     data_json = await websocket.recv()
     data = json.loads(data_json)
     print("success!")
-    os.system(f"bash ../implement/build.sh {data.image_name} {data.author_id} {data.container_name} {data.port} {data.folder} {data.run_command} {data.cmd_command}")
+    os.system(f"bash ../implement/build.sh {data.image_name} {data.author_id} {data.container_name} {data.port} '{data.folder}' '{data.run_command}' '{data.cmd_command}'")
     greeting=1
     await websocket.send(greeting)
 
