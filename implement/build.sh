@@ -19,9 +19,9 @@ cp -f $5 ./project
 echo 'FROM base:'$1'' > dockerfile #重新构建
 echo 'COPY ./project /root/project' >> dockerfile
 echo 'RUN '$6'' >> dockerfile
-echo 'CMD '$7'' >> dockerfile
+echo 'CMD cd /root/project && '$7'' >> dockerfile
 echo 'EXPOSE '$4'' >> dockerfile
 
 
 #构建
-docker build -t $2:$3
+docker build -t $2:$3 .

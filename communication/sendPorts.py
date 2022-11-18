@@ -13,11 +13,11 @@ def execShell(shell):
 def get_port(container):
     shell = "docker port "+container
     result = execShell(shell)
-    pat = ""
-    port = re.findall(pat, result)[0]
+    port=re.findall('(?<=:::).*$', result)
     return port
     
-
+# if __name__=="__main__":
+#     print(get_port("portainer_agent"))
 
 
 async def hello():
