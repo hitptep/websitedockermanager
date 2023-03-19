@@ -68,6 +68,7 @@ async def build_image(websocket, path):
         code = -1
         error = str(e)
 
+    shutil.rmtree(tmp_dir)
     # send the response back to the client
     response = {
         "author": author,
@@ -80,26 +81,23 @@ async def build_image(websocket, path):
     # log the result
     log_dir = os.path.expanduser("~/.config/dockermanager/logs")
     os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, "images.log")
+    # create the log file name with current date
+    log_file = os.path.join(log_dir, 'ImageBuild_{}.log'.format(time.strftime('%Y-%m-%d')))
+
     with open(log_file, "a") as f:
         if code == 1:
-            f.write(f"Built image {image_name}\n")
+            f.write(f"{nowtime()} - Built image {image_name}\n")
         else:
-            f.write(f"Failed to build image {image_name}: {error}\n")
+            f.write(f"{nowtime()} - Failed to build image {image_name}: {error}\n")
+
 
 async def websocket_server():
     # start the websocket server
     async with websockets.serve(build_image, "localhost", 8796):
-        print("ImageBuild Server started.")
+        # print("ImageBuild Server started.")
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":
-    try:
+
         asyncio.run(websocket_server())
-    except Exception as e:
-        # log the error
-        log_dir = os.path.expanduser("~/.config/dockermanager/logs")
-        os.makedirs(log_dir, exist_ok=True)
-        log_file = os.path.join(log_dir, "manager.log")
-        with open(log_file, "a") as f:
-            f.write(f"Failed to start ImageBuild Server: {str(e)}\n")
+
