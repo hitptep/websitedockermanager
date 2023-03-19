@@ -38,6 +38,8 @@ class ContainerRunServer:
                 ports={},
             )
 
+            container_id = container.id  # 获取容器ID
+
             port = None
             if container.attrs["NetworkSettings"]["Ports"]:
                 port = container.attrs["NetworkSettings"]["Ports"]["80/tcp"][0]["HostPort"]
@@ -48,11 +50,17 @@ class ContainerRunServer:
             # Set the stop callback function to log the reason for stopping the container
             container.stop_callback = lambda reason: print(f"Container stopped: {reason}")
 
-            response = {"author": author, "image": image, "code": 1}
+            response = {"author": author, "image": image, "code": 1, "id": container_id}  # 将容器ID添加到JSON对象中
             if port:
                 response["port"] = port
 
             await websocket.send(json.dumps(response))
+
+        except Exception as e:
+            print(f"Error handling request: {e}")
+            error = {"code": -1, "error": str(e)}
+            await websocket.send(json.dumps(error))
+
 
         except Exception as e:
             print(f"Error handling request: {e}")
