@@ -5,7 +5,7 @@ import json
 async def send_receive():
     async with websockets.connect('ws://localhost:8797') as websocket:
         # 构造要发送的JSON数据
-        data = {"author": "myname", "image": "myimage"}
+        data = {"author": "zzy", "image": "i2"}
         # 将字典转换为JSON字符串，并发送
         await websocket.send(json.dumps(data))
         print(f"Sending message: {json.dumps(data)}")

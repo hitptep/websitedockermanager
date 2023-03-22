@@ -24,19 +24,15 @@ async def handler(websocket, path):
 
     async for message in websocket:
         try:
-            data = json.loads(message)
 
-            author = data.get('author')
-            image = data.get('image')
 
-            container_name = f"{author}:{image}"
+            container_name = message
 
             success, error = docker_manager.remove_container(container_name)
 
             response = {
-                'author': author,
-                'image': image,
-                'code': 1 if success else -1 if error == 'container not found' else -2,
+                'id':container_name,
+                'code': 1 if success else -1 ,
             }
 
             if not success:

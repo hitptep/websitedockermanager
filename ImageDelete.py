@@ -1,8 +1,8 @@
-import threading
-import websocket
 import json
 import docker
 import os
+import asyncio
+import websockets
 from datetime import datetime
 
 # WebSocket服务器地址
@@ -17,27 +17,12 @@ LOG_DIR = os.path.expanduser('~/.config/dockermanager/logs')
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
-class WebSocketServer(threading.Thread):
-    def __init__(self, host, port):
-        super().__init__()
-        self.host = host
-        self.port = port
 
-    def run(self):
-        websocket.enableTrace(True)
-        server = websocket.WebSocketServer(self.host, self.port, WebSocketHandler)
-        server.serve_forever()
-
-class WebSocketHandler:
-    def __init__(self, client, server):
-        self.client = client
-        self.server = server
-
-    def handleMessage(self):
-        # 处理消息
-        try:
+async def handle_delete_image(websocket, path):
+    try:
+        async for data in websocket:
             # 解析JSON数据
-            data = json.loads(self.data)
+            data = json.loads(data)
 
             # 获取author和image
             author = data.get('author')
@@ -45,7 +30,7 @@ class WebSocketHandler:
 
             # 删除镜像
             try:
-                client.images.remove(f'{author}/{image}')
+                client.images.remove(f'{author}:{image}')
                 code = 1
                 error = None
             except docker.errors.ImageNotFound:
@@ -69,18 +54,17 @@ class WebSocketHandler:
             with open(log_file, 'a') as f:
                 f.write(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} {author}/{image}\n')
 
-            return json.dumps(result)
-        except Exception as e:
-            return json.dumps({'code': -1, 'error': str(e)})
+            # 发送返回消息
+            await websocket.send(json.dumps(result))
+    except Exception as e:
+        print(e)
 
-    def handleConnected(self):
-        print(f'Client {self.client_address[0]} connected')
-
-    def handleClose(self):
-        print(f'Client {self.client_address[0]} closed')
 
 if __name__ == '__main__':
     # 启动WebSocket服务器
-    server = WebSocketServer(HOST, PORT)
-    server.start()
+    start_server = websockets.serve(handle_delete_image, HOST, PORT)
+    asyncio.get_event_loop().run_until_complete(start_server)
     print(f'WebSocket server started at {HOST}:{PORT}')
+
+    # 运行事件循环
+    asyncio.get_event_loop().run_forever()

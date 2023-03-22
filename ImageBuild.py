@@ -6,6 +6,7 @@ import random
 import shutil
 import subprocess
 from datetime import datetime
+import time
 
 def nowtime():
     now=datetime.now()
@@ -59,7 +60,7 @@ async def build_image(websocket, path):
         shutil.copy(file, project_dir)
 
     # build the Docker image
-    image_name = f"{author}/{image}"
+    image_name = f"{author}:{image}"
     try:
         subprocess.run(["docker", "build", "-t", image_name, tmp_dir], check=True)
         code = 1

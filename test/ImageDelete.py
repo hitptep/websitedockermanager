@@ -6,8 +6,8 @@ import websockets
 async def send_delete_image_request():
     uri = "ws://localhost:8799"
     async with websockets.connect(uri) as websocket:
-        author = "myname"
-        image = "myimage"
+        author = "zzy"
+        image = "i2"
         request = {"author": author, "image": image}
         await websocket.send(json.dumps(request))
         response = await websocket.recv()
