@@ -1,0 +1,12 @@
+[Unit]
+Description=dockermanager
+After=multi-user.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/
+ExecStart=python3 /home/ubuntu/dockermanager/Clean.py /home/ubuntu/dockermanager/ContainerDelete.py /home/ubuntu/dockermanager/ContainerRun.py /home/ubuntu/dockermanager/IfClose.py /home/ubuntu/dockermanager/ImageBuild.py /home/ubuntu/dockermanager/ImageDelete.py /home/ubuntu/dockermanager/Roomeye.py
+
+[Install]
+WantedBy=multi-user.target
